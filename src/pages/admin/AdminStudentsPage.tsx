@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Plus, Search, Edit2, Trash2, Filter, Users, Phone, Calendar } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Filter, Users, Phone, Calendar, Unlink } from 'lucide-react';
 import { api } from '../../api/client';
 import { Student, Group } from '../../types';
 import { Table, Column } from '../../components/ui/Table';
@@ -151,6 +151,16 @@ export const AdminStudentsPage: React.FC = () => {
     }
   };
 
+  const handleUnlinkTelegram = async (student: Student) => {
+    if (!confirm(`${student.fullName} uchun Telegram ulanishini uzmoqchimisiz?`)) return;
+    try {
+      await api.delete(`/admin/students/${student.id}/telegram`);
+      fetchStudents();
+    } catch (err: any) {
+      alert(err.message || 'Telegram uzishda xatolik yuz berdi.');
+    }
+  };
+
   // Pagination slicing
   const paginatedStudents = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
@@ -210,6 +220,17 @@ export const AdminStudentsPage: React.FC = () => {
       className: 'text-right',
       accessor: (s) => (
         <div className="flex items-center justify-end gap-2">
+          {s.parentTelegramChatId && (
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => handleUnlinkTelegram(s)}
+              className="!p-2 text-orange-500"
+              title="Telegram uzish"
+            >
+              <Unlink className="w-4 h-4" />
+            </Button>
+          )}
           <Button
             size="sm"
             variant="default"
