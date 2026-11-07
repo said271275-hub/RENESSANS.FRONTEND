@@ -197,6 +197,38 @@ export const DashboardLayout: React.FC = () => {
 
         {/* Sidebar Footer with Logout */}
         <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2.5">
+
+          {/* Telegram Bot Link */}
+          <a
+            href="https://t.me/renessanss_bot"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="@renessanss_bot — Telegram bot"
+            className={`flex items-center rounded-2xl transition-all duration-200 group bg-gradient-to-r from-sky-500/10 to-blue-500/10 border border-sky-500/20 hover:from-sky-500/20 hover:to-blue-500/20 hover:border-sky-500/40 hover:scale-[1.02] active:scale-95 ${
+              isCollapsed ? 'justify-center p-3' : 'gap-2.5 px-3 py-2.5'
+            }`}
+          >
+            {/* Telegram Icon (SVG) */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-5 h-5 shrink-0 text-sky-500 group-hover:text-sky-400 transition-colors"
+            >
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.927 14.147l-2.95-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.211.412z" />
+            </svg>
+            {!isCollapsed && (
+              <div className="overflow-hidden">
+                <p className="text-xs font-bold text-sky-500 group-hover:text-sky-400 leading-tight">
+                  Telegram Bot
+                </p>
+                <p className="text-[10px] text-[var(--text-muted)] font-mono leading-tight">
+                  @renessanss_bot
+                </p>
+              </div>
+            )}
+          </a>
+
           <Button
             variant="danger"
             size="md"
