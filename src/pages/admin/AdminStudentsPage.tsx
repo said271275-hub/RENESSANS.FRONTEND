@@ -193,6 +193,19 @@ export const AdminStudentsPage: React.FC = () => {
       accessor: (s) => <span className="text-xs font-mono font-medium">{s.parentPhone}</span>,
     },
     {
+      header: 'Telegram Bot',
+      accessor: (s) =>
+        s.parentTelegramChatId ? (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+            ✅ Ulangan
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--text-muted)] bg-black/5 dark:bg-white/5 px-2.5 py-1 rounded-full border border-[var(--border-subtle)]">
+            ❌ Ulanmagan
+          </span>
+        ),
+    },
+    {
       header: 'Amallar',
       className: 'text-right',
       accessor: (s) => (

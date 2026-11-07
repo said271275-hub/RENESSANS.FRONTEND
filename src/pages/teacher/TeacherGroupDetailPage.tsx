@@ -392,6 +392,15 @@ export const TeacherGroupDetailPage: React.FC = () => {
                             <p className="text-[11px] font-mono text-[var(--text-muted)] tracking-wider">
                               {student.studentCode}
                             </p>
+                            {student.parentTelegramChatId ? (
+                              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 mt-0.5">
+                                ✅ Bot ulangan
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-semibold text-[var(--text-muted)] flex items-center gap-0.5 mt-0.5">
+                                ❌ Bot ulanmagan
+                              </span>
+                            )}
                           </div>
                         </div>
                       </td>

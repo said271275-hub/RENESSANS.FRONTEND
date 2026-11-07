@@ -14,6 +14,7 @@ export interface Student {
   fullName: string;
   phone: string;
   parentPhone: string;
+  parentTelegramChatId?: string | null;
   birthDate: string;
   monthlyFee: number;
   groupId: number | null;
@@ -188,6 +189,7 @@ export interface EvaluatedStudent {
   fullName: string;
   phone: string;
   parentPhone: string;
+  parentTelegramChatId?: string | null;
   birthDate: string;
   studentCode: string;
   totalScore: number;
