@@ -4,11 +4,12 @@ import { useTheme } from '../../context/ThemeContext';
 
 /**
  * Kun/Tun almashtirgich.
- * Kun: bolacha teshik yonida turadi. Bosilganda teshikka yuguradi, tushib ketadi va tun bo'ladi.
- * Tun: bosilganda bolacha teshikdan sakrab chiqadi va kun bo'ladi.
+ * Kun: bolacha quyosh tomon yuguradi va unga yetganda yo'q bo'lib qoladi.
+ *      Bosilganda quyoshdan chiqib, teshikka yuguradi, tushib ketadi va tun bo'ladi.
+ * Tun: bosilganda bolacha teshikdan sakrab chiqadi, quyosh tomon yuguradi va kun bo'ladi.
  */
 
-type Phase = 'idle' | 'walking' | 'falling' | 'hidden' | 'rising';
+type Phase = 'idle' | 'walking' | 'falling' | 'hidden' | 'rising' | 'sun';
 
 interface Sim {
   phase: Phase;
@@ -24,6 +25,7 @@ interface Sim {
 const BODY_H = 22;
 const GRAVITY = 0.32;
 const WALK_SPEED = 1.3;
+const SUN_X = -8; // quyosh tugmasi canvasning chap chetida
 
 export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }) => {
   const { theme, toggleTheme } = useTheme();
@@ -70,6 +72,8 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
           if (s.target === holeX) {
             s.phase = 'falling';
             s.vy = 0.5;
+          } else if (s.target === SUN_X) {
+            s.phase = 'sun'; // quyoshga yetdi — yo'q bo'ldi
           } else {
             s.phase = 'idle';
           }
@@ -87,6 +91,10 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
         }
         s.dirty = true;
         break;
+      case 'sun':
+        s.x = SUN_X;
+        s.y = groundY;
+        break;
       case 'hidden':
         s.x = holeX;
         s.y = groundY + BODY_H + 6;
@@ -95,14 +103,14 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
         s.vy += GRAVITY;
         s.y += s.vy;
         if (s.y < groundY - 2) {
-          // yerdan chiqdi — o'z joyiga qarab suriladi
-          s.x += Math.sign(stickX - s.x) * Math.min(Math.abs(stickX - s.x), 0.9);
+          // yerdan chiqdi — quyosh tomonga suriladi
+          s.x -= 1.4;
         }
         if (s.vy > 0 && s.y >= groundY) {
           s.y = groundY;
           s.vy = 0;
           s.phase = 'walking';
-          s.target = stickX;
+          s.target = SUN_X;
         }
         s.dirty = true;
         break;
@@ -136,12 +144,14 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
 
   const drawStickman = (ctx: CanvasRenderingContext2D) => {
     const s = simRef.current;
-    if (s.phase === 'hidden') return;
+    if (s.phase === 'hidden' || s.phase === 'sun') return;
     const { groundY } = layout();
     const dark = themeRef.current === 'dark';
     const color = dark ? '#f1f5f9' : '#1f2937';
 
     ctx.save();
+    // quyoshga yaqinlashganda asta so'nadi
+    ctx.globalAlpha = Math.max(0, Math.min(1, (s.x + 4) / 22));
     // yer ostidagi qismi ko'rinmaydi (teshikka sho'ng'ish)
     ctx.beginPath();
     ctx.rect(0, 0, sizeRef.current.w, groundY + 1);
@@ -220,6 +230,7 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
       const s = simRef.current;
       const { holeX, stickX, groundY } = layout();
       if (s.phase === 'idle') { s.x = stickX; s.y = groundY; }
+      if (s.phase === 'sun') { s.x = SUN_X; s.y = groundY; }
       if (s.phase === 'hidden') { s.x = holeX; s.y = groundY + BODY_H + 6; }
       s.dirty = true;
     };
@@ -248,13 +259,13 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
   useEffect(() => {
     const s = simRef.current;
     const { holeX, stickX, groundY } = layout();
-    if (theme === 'dark' && (s.phase === 'idle' || s.phase === 'walking')) {
+    if (theme === 'dark' && (s.phase === 'idle' || s.phase === 'walking' || s.phase === 'sun')) {
       s.phase = 'hidden';
       s.x = holeX;
       s.y = groundY + BODY_H + 6;
     } else if (theme === 'light' && s.phase === 'hidden') {
-      s.phase = 'idle';
-      s.x = stickX;
+      s.phase = 'sun';
+      s.x = SUN_X;
       s.y = groundY;
     }
     s.dirty = true;
@@ -271,6 +282,12 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className = '' }
     }
     if (s.phase === 'idle') {
       s.phase = 'walking';
+      s.target = holeX;
+    } else if (s.phase === 'sun') {
+      // quyoshdan chiqib, teshik tomon yuradi
+      s.phase = 'walking';
+      s.x = SUN_X;
+      s.y = groundY;
       s.target = holeX;
     } else if (s.phase === 'hidden') {
       s.phase = 'rising';
